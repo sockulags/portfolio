@@ -1,0 +1,15 @@
+/* TEAM */
+Developer: Lucas Skog
+Role: Full-stack developer
+Location: Stockholm, Sweden
+GitHub: https://github.com/sockulags
+Contact: lucasskog@gmail.com
+
+/* TECHNOLOGY */
+Vite, TypeScript, three.js
+Hosted on GitHub Pages
+No cookies, no tracking
+
+/* THANKS */
+Thanks for checking the source — curiosity like yours is exactly
+why this site hides secrets in the particles. Happy hunting.

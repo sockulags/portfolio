@@ -1,0 +1,18 @@
+# Lucas Skog
+
+> Full-stack developer based in Stockholm, Sweden. I build AI-driven products — from local agents to complete SaaS platforms. This file is in English; the portfolio site itself is bilingual (Swedish/English).
+
+Portfolio: https://sockulags.github.io/portfolio/
+
+## Projects
+
+- [Pilot](https://github.com/sockulags/pilot): Local-first AI agent that verifies its own work — runs fully local on Windows via Ollama, gathers evidence before answering, ships a reproducible eval suite. Open source (Python, FastAPI, MCP).
+- [Rep Counter](https://github.com/sockulags/rep-counter): Mobile-first PWA for logging exercise reps — quick buttons, daily goals, activity heatmap; all data stays on the device. Live at https://sockulags.github.io/rep-counter/ (TypeScript, Service Worker).
+- [Meritvo](https://sockulags.github.io/portfolio/#meritvo): AI-assisted CV platform — experience stored once in a language-neutral masterdata model, every AI edit goes through a review queue. Private beta (Next.js, PostgreSQL, OpenAI).
+- [Design-Pilot](https://sockulags.github.io/portfolio/#design-pilot): shadcn-inspired site builder — a Figma-like canvas rendering real React components plus a CLI that copies production-ready code into your project. In development, private (TypeScript, React, Anthropic API).
+- [Smask!](https://sockulags.github.io/portfolio/#smask): The family cookbook — stores recipes the family actually cooked, with AI ingestion (photo, link or voice) and a merged shopping list. Private beta (Next.js, Supabase, Anthropic API).
+
+## Contact
+
+- [Email](mailto:lucasskog@gmail.com): lucasskog@gmail.com
+- [GitHub](https://github.com/sockulags): github.com/sockulags

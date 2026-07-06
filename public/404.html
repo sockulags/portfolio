@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>404 · Lucas Skog</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-elevated: #12121a;
+    --fg: #eceaf6;
+    --muted: rgba(236, 234, 246, 0.55);
+    --faint: rgba(236, 234, 246, 0.12);
+    --accent: #7c6cff;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f4f3ef;
+      --bg-elevated: #ffffff;
+      --fg: #16161d;
+      --muted: rgba(22, 22, 29, 0.6);
+      --faint: rgba(22, 22, 29, 0.12);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f3ef;
+    --bg-elevated: #ffffff;
+    --fg: #16161d;
+    --muted: rgba(22, 22, 29, 0.6);
+    --faint: rgba(22, 22, 29, 0.12);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    overflow-x: hidden;
+    transition: background 0.5s ease, color 0.5s ease;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  [hidden] { display: none !important; }
+
+  #fx { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+
+  .logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 1.1rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.03em;
+    color: var(--fg);
+    text-decoration: none;
+    z-index: 2;
+  }
+  .logo-dot { color: var(--accent); }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 1.5rem;
+    max-width: 38rem;
+  }
+  /* med JS ritar canvasen "404" ovanför — knuffa ned texten */
+  html.js .wrap { transform: translateY(min(19vh, 190px)); }
+
+  .code {
+    font-weight: 700;
+    font-size: clamp(4.5rem, 20vw, 8.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    margin-bottom: 1.4rem;
+  }
+  @supports (-webkit-text-stroke: 2px black) {
+    .code { color: transparent; -webkit-text-stroke: 2px var(--accent); }
+  }
+  /* JS på: partiklarna är vår 404:a — behåll den för skärmläsare */
+  html.js .code {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    -webkit-text-stroke: 0;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 5.5vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+  }
+
+  .sub {
+    margin: 1.1rem auto 0;
+    max-width: 30rem;
+    color: var(--muted);
+  }
+
+  .links {
+    margin-top: 2.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .btn {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--fg);
+    text-decoration: none;
+    border: 1px solid var(--faint);
+    border-radius: 999px;
+    padding: 0.65rem 1.4rem;
+    transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+  }
+  .btn:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+  .btn-accent:hover {
+    background: color-mix(in srgb, var(--accent) 82%, var(--fg));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+<script>
+  // Före render: matcha sajtens valda tema + flagga att JS finns (döljer HTML-404:an).
+  (function () {
+    try {
+      var th = localStorage.getItem("pf-theme");
+      if (th === "light" || th === "dark") document.documentElement.dataset.theme = th;
+    } catch (e) {}
+    document.documentElement.classList.add("js");
+  })();
+</script>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<a class="logo" href="/portfolio/">LS<span class="logo-dot">.</span></a>
+
+<main class="wrap">
+  <p class="code">404</p>
+  <h1 id="h">Här var det tomt.</h1>
+  <p class="sub" id="s">Sidan du letar efter finns inte — men partiklarna hittade hem.</p>
+  <p class="links">
+    <a class="btn btn-accent" id="sugg" hidden href="/portfolio/"></a>
+    <a class="btn" id="back" href="/portfolio/">← Till startsidan</a>
+  </p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- språk ---------- */
+
+  var SV = (navigator.language || "").toLowerCase().indexOf("sv") === 0;
+  var T = SV
+    ? {
+        heading: "Här var det tomt.",
+        sub: "Sidan du letar efter finns inte — men partiklarna hittade hem.",
+        back: "← Till startsidan",
+        didYouMean: function (slug) { return "Menade du /#" + slug + "?"; }
+      }
+    : {
+        heading: "Nothing here.",
+        sub: "The page you're looking for doesn't exist — but the particles found their way home.",
+        back: "← Back home",
+        didYouMean: function (slug) { return "Did you mean /#" + slug + "?"; }
+      };
+
+  document.documentElement.lang = SV ? "sv" : "en";
+  document.getElementById("h").textContent = T.heading;
+  document.getElementById("s").textContent = T.sub;
+  document.getElementById("back").textContent = T.back;
+
+  /* ---------- fuzzy-förslag ---------- */
+
+  function lev(a, b) {
+    var m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+    var prev = [], cur = [], i, j, t;
+    for (j = 0; j <= n; j++) prev[j] = j;
+    for (i = 1; i <= m; i++) {
+      cur[0] = i;
+      for (j = 1; j <= n; j++) {
+        cur[j] = Math.min(
+          prev[j] + 1,
+          cur[j - 1] + 1,
+          prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1)
+        );
+      }
+      t = prev; prev = cur; cur = t;
+    }
+    return prev[n];
+  }
+
+  var SLUGS = ["meritvo", "pilot", "design-pilot", "rep-counter", "smask", "kontakt", "hem"];
+  var seg = location.pathname.replace(/\/+$/, "").split("/").pop() || "";
+  try { seg = decodeURIComponent(seg); } catch (e) {}
+  seg = seg.toLowerCase();
+
+  if (seg && seg !== "404.html") {
+    var best = "", bd = Infinity;
+    for (var si = 0; si < SLUGS.length; si++) {
+      var d = lev(seg, SLUGS[si]);
+      if (d < bd) { bd = d; best = SLUGS[si]; }
+    }
+    if (bd <= 3) {
+      var sugg = document.getElementById("sugg");
+      sugg.href = "/portfolio/#" + best;
+      sugg.textContent = T.didYouMean(best);
+      sugg.hidden = false;
+    }
+  }
+
+  /* ---------- partiklar ---------- */
+
+  var canvas = document.getElementById("fx");
+  var ctx = canvas.getContext && canvas.getContext("2d");
+  if (!ctx) { document.documentElement.classList.remove("js"); return; }
+
+  var CNT = 2500, R = 80, R2 = R * R;
+  var tx = new Float32Array(CNT), ty = new Float32Array(CNT);
+  var px = new Float32Array(CNT), py = new Float32Array(CNT);
+  var ph = new Float32Array(CNT), sp = new Float32Array(CNT), amp = new Float32Array(CNT);
+  // hinkgränser: ~10 % accent, resten fg i fallande alfa — spatialt slumpat via blandade mål
+  var CUT = [250, 800, 1500, 2100, CNT];
+  var palette = [];
+  var W = 0, H = 0, raf = 0;
+  var mouse = { x: -9e3, y: -9e3 };
+
+  var mqMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var mqLight = window.matchMedia("(prefers-color-scheme: light)");
+  var reduced = mqMotion.matches;
+
+  function cssColor(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function rgb(hex) {
+    var h = hex.replace("#", "");
+    if (h.length === 3) h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2);
+    var n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  function buildPalette() {
+    var fg = rgb(cssColor("--fg") || "#eceaf6");
+    var ac = cssColor("--accent") || "#7c6cff";
+    var f = function (a) { return "rgba(" + fg[0] + "," + fg[1] + "," + fg[2] + "," + a + ")"; };
+    palette = [ac, f(0.9), f(0.6), f(0.42), f(0.26)];
+  }
+
+  function sampleTargets() {
+    var fs = Math.max(56, Math.min(H * 0.3, (W * 0.84) / 1.9, 360));
+    var off = document.createElement("canvas");
+    var o = off.getContext("2d", { willReadFrequently: true });
+    if (!o) return false;
+    var font = "700 " + fs + "px system-ui, -apple-system, 'Segoe UI', sans-serif";
+    o.font = font;
+    var tw = o.measureText("404").width;
+    off.width = Math.ceil(tw) + 12;
+    off.height = Math.ceil(fs * 1.35);
+    o.font = font; // storleksändring nollställer fonten
+    o.textAlign = "center";
+    o.textBaseline = "middle";
+    o.fillStyle = "#fff";
+    o.fillText("404", off.width / 2, off.height * 0.55);
+
+    var img = o.getImageData(0, 0, off.width, off.height).data;
+    var cand = [], step = 2, cx, cy;
+    for (cy = 0; cy < off.height; cy += step) {
+      for (cx = 0; cx < off.width; cx += step) {
+        if (img[(cy * off.width + cx) * 4 + 3] > 140) cand.push(cx, cy);
+      }
+    }
+    var np = cand.length / 2;
+    if (np < 80) return false;
+
+    // Fisher–Yates på punktpar
+    for (var i = np - 1; i > 0; i--) {
+      var r = (Math.random() * (i + 1)) | 0;
+      var a2 = i * 2, b2 = r * 2, t0 = cand[a2], t1 = cand[a2 + 1];
+      cand[a2] = cand[b2]; cand[a2 + 1] = cand[b2 + 1];
+      cand[b2] = t0; cand[b2 + 1] = t1;
+    }
+
+    var ox = W / 2 - off.width / 2;
+    var oy = H * 0.3 - off.height / 2;
+    for (var k = 0; k < CNT; k++) {
+      var c = (k % np) * 2;
+      var j = k < np ? 0.7 : 2.2; // dubbletter får mer jitter
+      tx[k] = ox + cand[c] + (Math.random() - 0.5) * 2 * j;
+      ty[k] = oy + cand[c + 1] + (Math.random() - 0.5) * 2 * j;
+    }
+    return true;
+  }
+
+  function draw(time, animate) {
+    ctx.clearRect(0, 0, W, H);
+    var s = 0;
+    for (var b = 0; b < 5; b++) {
+      ctx.fillStyle = palette[b];
+      var e = CUT[b];
+      var sz = b === 0 ? 2 : 1.6;
+      var hs = sz / 2;
+      for (var i = s; i < e; i++) {
+        var nx = px[i], ny = py[i];
+        if (animate) {
+          nx += (tx[i] - nx) * 0.06;
+          ny += (ty[i] - ny) * 0.06;
+          var dx = nx - mouse.x, dy = ny - mouse.y;
+          var d2 = dx * dx + dy * dy;
+          if (d2 < R2 && d2 > 0.01) {
+            var d = Math.sqrt(d2);
+            var f = (R - d) / R;
+            nx += (dx / d) * f * 7;
+            ny += (dy / d) * f * 7;
+          }
+          px[i] = nx;
+          py[i] = ny;
+          nx += Math.sin(time * sp[i] + ph[i]) * amp[i];
+          ny += Math.cos(time * sp[i] * 0.9 + ph[i] * 1.3) * amp[i];
+        }
+        ctx.fillRect(nx - hs, ny - hs, sz, sz);
+      }
+      s = e;
+    }
+  }
+
+  function loop(now) {
+    raf = requestAnimationFrame(loop);
+    draw(now / 1000, true);
+  }
+
+  function stop() {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  function snapAndDrawStatic() {
+    for (var i = 0; i < CNT; i++) { px[i] = tx[i]; py[i] = ty[i]; }
+    draw(0, false);
+  }
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!sampleTargets()) {
+      // ingen textsampling ⇒ visa HTML-404:an igen
+      stop();
+      canvas.style.display = "none";
+      document.documentElement.classList.remove("js");
+      return false;
+    }
+    if (reduced) { stop(); snapAndDrawStatic(); }
+    return true;
+  }
+
+  for (var i0 = 0; i0 < CNT; i0++) {
+    px[i0] = Math.random() * window.innerWidth;
+    py[i0] = Math.random() * window.innerHeight;
+    ph[i0] = Math.random() * Math.PI * 2;
+    sp[i0] = 0.5 + Math.random() * 1.1;
+    amp[i0] = 0.6 + Math.random() * 1.9;
+  }
+
+  buildPalette();
+  if (!resize()) return;
+  if (!reduced) raf = requestAnimationFrame(loop);
+
+  window.addEventListener("pointermove", function (e) {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  }, { passive: true });
+  window.addEventListener("pointerout", function () { mouse.x = -9e3; mouse.y = -9e3; });
+  window.addEventListener("blur", function () { mouse.x = -9e3; mouse.y = -9e3; });
+
+  var rt;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(resize, 150);
+  });
+
+  if (mqMotion.addEventListener) {
+    mqMotion.addEventListener("change", function (e) {
+      reduced = e.matches;
+      if (reduced) { stop(); snapAndDrawStatic(); }
+      else if (!raf) raf = requestAnimationFrame(loop);
+    });
+    mqLight.addEventListener("change", function () {
+      buildPalette();
+      if (reduced) snapAndDrawStatic();
+    });
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) stop();
+    else if (!reduced && !raf) raf = requestAnimationFrame(loop);
+  });
+})();
+</script>
+</body>
+</html>

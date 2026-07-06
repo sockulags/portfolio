@@ -17,6 +17,7 @@ export class CommandPalette {
   private commands: Command[] = [];
   private filtered: Command[] = [];
   private selected = 0;
+  private returnFocus: HTMLElement | null = null;
   private getCommands: () => Command[];
   private placeholder: () => string;
   private emptyText: () => string;
@@ -30,8 +31,9 @@ export class CommandPalette {
     this.overlay.className = "palette-overlay";
     this.overlay.innerHTML = `
       <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
-        <input class="palette-input" type="text" spellcheck="false" autocomplete="off" />
-        <div class="palette-list" role="listbox"></div>
+        <input class="palette-input" type="text" spellcheck="false" autocomplete="off"
+          role="combobox" aria-expanded="true" aria-controls="palette-listbox" aria-autocomplete="list" />
+        <div class="palette-list" id="palette-listbox" role="listbox"></div>
       </div>`;
     document.body.append(this.overlay);
     this.input = this.overlay.querySelector(".palette-input")!;
@@ -51,6 +53,9 @@ export class CommandPalette {
       } else if (e.key === "Enter") {
         e.preventDefault();
         this.runSelected();
+      } else if (e.key === "Tab") {
+        // fokusfälla: paletten är en modal med ett enda fokusmål
+        e.preventDefault();
       }
     });
   }
@@ -60,6 +65,7 @@ export class CommandPalette {
   }
 
   open(): void {
+    this.returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.commands = this.getCommands();
     this.input.placeholder = this.placeholder();
     this.input.value = "";
@@ -69,8 +75,11 @@ export class CommandPalette {
   }
 
   close(): void {
+    if (!this.isOpen) return;
     this.overlay.classList.remove("is-open");
     this.input.blur();
+    this.returnFocus?.focus();
+    this.returnFocus = null;
   }
 
   toggle(): void {
@@ -122,11 +131,13 @@ export class CommandPalette {
         html += `<div class="palette-group">${c.group}</div>`;
         lastGroup = c.group;
       }
-      html += `<button class="palette-item${i === this.selected ? " is-selected" : ""}" data-idx="${i}" role="option" aria-selected="${i === this.selected}">
+      html += `<button class="palette-item${i === this.selected ? " is-selected" : ""}" data-idx="${i}" id="palette-opt-${i}" role="option" aria-selected="${i === this.selected}" tabindex="-1">
         <span>${c.label}</span>${c.hint ? `<kbd>${c.hint}</kbd>` : ""}
       </button>`;
     });
     this.list.innerHTML = html;
+    // skärmläsaren följer pilvalet via aria-activedescendant
+    this.input.setAttribute("aria-activedescendant", this.filtered.length ? `palette-opt-${this.selected}` : "");
     this.list.querySelectorAll<HTMLButtonElement>(".palette-item").forEach((el) => {
       el.addEventListener("pointerenter", () => {
         this.selected = Number(el.dataset.idx);

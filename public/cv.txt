@@ -1,0 +1,70 @@
+========================================================================
+LUCAS SKOG
+Full-stack developer — Stockholm, Sweden
+lucasskog@gmail.com | github.com/sockulags | sockulags.github.io/portfolio
+========================================================================
+
+SUMMARY
+
+I build AI-driven products — from local agents to complete SaaS
+platforms. Comfortable across the whole stack: data modelling, APIs,
+AI pipelines and polished front ends.
+
+SELECTED WORK
+------------------------------------------------------------------------
+
+Meritvo — AI-assisted CV platform (private beta)
+  * AI proposes, you approve: every AI edit goes through a review
+    queue; nothing is silently rewritten.
+  * Paste a job ad to get a match score, keywords, gaps and concrete
+    recommendations.
+  * PDF/HTML/TXT export from a shared render model — preview and
+    export are always identical.
+  Tech: Next.js 16, React 19, PostgreSQL, Prisma, Stripe, OpenAI, NextAuth
+
+Pilot — Local-first AI agent that verifies its own work (open source)
+  * Local-first: runs on Ollama models with no cloud — OpenAI as an
+    optional backend.
+  * Reproducible eval suite: capabilities are measured, not claimed.
+  * Layered safety model with timeouts, tokens and loopback by default.
+  Tech: Python, FastAPI, Ollama, MCP, WebSocket, React
+  Code: https://github.com/sockulags/pilot
+
+Design-Pilot — Site builder with canvas and CLI (in development)
+  * Drag and drop real React components, edit props per instance,
+    nest freely.
+  * Build multiple pages and layouts, wire internal links, export the
+    whole project — no npm dependency, the code is yours.
+  * AI assistant via a local proxy — the API key never leaves the machine.
+  Tech: TypeScript, React, Vite, Node CLI, pnpm workspaces, Anthropic API
+
+Rep Counter — PWA for daily exercise logging (live)
+  * Lightning-fast logging with quick buttons and an active-exercise
+    carousel.
+  * Overview with heatmap, daily totals and editable entries.
+  * No server, no account — local storage with full reset support.
+  Tech: TypeScript, PWA, Service Worker, GitHub Actions, GitHub Pages
+  Live: https://sockulags.github.io/rep-counter/
+  Code: https://github.com/sockulags/rep-counter
+
+Smask! — The family cookbook: tested and approved recipes (private beta)
+  * AI ingestion: photograph a cookbook page, paste a link or dictate
+    the recipe.
+  * Shopping list that merges ingredients across recipes and groups
+    by store section.
+  * Image pipeline with three webp variants and portion scaling right
+    in the recipe view.
+  Tech: Next.js 16, React 19, Tailwind 4, Supabase, Anthropic API, sharp
+
+TECHNICAL BREADTH
+------------------------------------------------------------------------
+Frontend:  TypeScript, React, Next.js, three.js, Tailwind, Vite, PWA
+Backend:   Python, FastAPI, Node.js, PostgreSQL, Prisma, Supabase
+AI:        Anthropic API, OpenAI, Ollama, MCP, agent design, eval suites
+Tools:     Git, GitHub Actions, CI/CD, pnpm workspaces, Stripe
+
+CONTACT
+------------------------------------------------------------------------
+Email:   lucasskog@gmail.com
+GitHub:  https://github.com/sockulags
+Site:    https://sockulags.github.io/portfolio/  (bilingual sv/en)

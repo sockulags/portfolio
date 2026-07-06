@@ -213,6 +213,10 @@ export const ui = {
   shortcutsLang: { sv: "Växla språk", en: "Toggle language" },
   shortcutsHelp: { sv: "Visa denna hjälp", en: "Show this help" },
   shortcutsClose: { sv: "Stäng överlägg", en: "Close overlay" },
+  shortcutsAudio: { sv: "Ljud på/av", en: "Sound on/off" },
+  shortcutsDebug: { sv: "Debug-HUD", en: "Debug HUD" },
+  shortcutsTerminal: { sv: "Öppna terminalen", en: "Open the terminal" },
+  shortcutsPrint: { sv: "Skriv ut som riktigt CV", en: "Print as a real CV" },
   status: { sv: "Status", en: "Status" },
   privateRepo: { sv: "Privat repo", en: "Private repo" },
 } as const;
