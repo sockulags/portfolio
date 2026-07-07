@@ -13,6 +13,10 @@ export type AppEngine = EngineApi & {
 
 export function createEngine(canvas: HTMLCanvasElement): AppEngine {
   try {
+    // upprepad kontextförlust i denna flik ⇒ ge upp GPGPU och kör den lätta CPU-motorn
+    if (sessionStorage.getItem("pf-gl-fallback") === "cpu") {
+      throw new Error("GPGPU nedgraderad efter upprepad kontextförlust");
+    }
     // proba på en temporär canvas så huvudcanvasens kontext inte låses med fel attribut
     const probe = document.createElement("canvas").getContext("webgl2");
     if (!probe || !probe.getExtension("EXT_color_buffer_float")) {

@@ -183,6 +183,15 @@ export class CpuEngine implements EngineApi {
       this.running = !document.hidden;
       if (this.running) this.clock.getDelta();
     });
+    // three.js återuppladdar sina buffertar vid restore — pausa och återuppta bara
+    canvas.addEventListener("webglcontextlost", (e) => {
+      e.preventDefault();
+      this.running = false;
+    });
+    canvas.addEventListener("webglcontextrestored", () => {
+      this.running = !document.hidden;
+      if (this.running) this.clock.getDelta();
+    });
 
     this.tick();
   }

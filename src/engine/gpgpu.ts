@@ -294,10 +294,20 @@ export class GpgpuEngine implements EngineApi {
   private raycaster = new THREE.Raycaster();
   private plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
   private baseTilt = -0.34;
+  private canvas!: HTMLCanvasElement;
+  private contextLost = false;
+  private recovering = false;
+  private restoreTimer: ReturnType<typeof setTimeout> | undefined;
+  private loseExt: WEBGL_lose_context | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     const lowEnd = window.innerWidth < 768 || navigator.hardwareConcurrency <= 4;
-    this.size = lowEnd ? 256 : 512;
+    // en tidigare kontextförlust i denna flik tvingar ner budgeten
+    const downgraded = sessionStorage.getItem("pf-gl-downgrade") === "1";
+    // 384² = 147k partiklar: rejält moln men ~44 % lägre GPU-last per bildruta
+    // än 512² (262k), vilket drastiskt minskar risken för TDR/kontextförlust
+    this.size = lowEnd || downgraded ? 256 : 384;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -320,10 +330,73 @@ export class GpgpuEngine implements EngineApi {
       this.running = !document.hidden;
       if (this.running) this.clock.getDelta();
     });
-    canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
-    canvas.addEventListener("webglcontextrestored", () => this.rebuild(this.size));
+    this.loseExt = this.renderer.getContext().getExtension("WEBGL_lose_context");
+    canvas.addEventListener("webglcontextlost", this.onContextLost, false);
+    canvas.addEventListener("webglcontextrestored", this.onContextRestored, false);
 
     this.tick();
+  }
+
+  // ---------- WebGL-kontextförlust ----------
+  // Tunga bildrutor kan trigga GPU:ns watchdog (TDR på Windows) och slänga
+  // kontexten. Utan hantering blir canvasen permanent svart medan tick-loopen
+  // snurrar vidare i tomma intet. Kedjan: sömlös rebuild → reload på lägre
+  // budget → CPU-motor, så en förlust blir en blink i stället för en krasch.
+
+  private onContextLost = (e: Event): void => {
+    e.preventDefault(); // krävs för att "restored" ska kunna avfyras
+    this.contextLost = true;
+    this.running = false;
+    clearTimeout(this.restoreTimer);
+    // återställer webbläsaren inte själv inom 3 s, tvinga fram återhämtning
+    this.restoreTimer = setTimeout(() => {
+      if (this.contextLost) this.hardRecover();
+    }, 3000);
+  };
+
+  private onContextRestored = (): void => {
+    clearTimeout(this.restoreTimer);
+    this.contextLost = false;
+    try {
+      this.rebuild(this.size);
+      this.running = !document.hidden;
+      if (this.running) this.clock.getDelta();
+    } catch {
+      this.hardRecover();
+    }
+  };
+
+  /** Sista utväg när kontexten inte kommer tillbaka av sig själv. */
+  private hardRecover(): void {
+    if (this.recovering) return;
+    this.recovering = true;
+    const attempts = Number(sessionStorage.getItem("pf-gl-recover") || 0);
+    sessionStorage.setItem("pf-gl-recover", String(attempts + 1));
+    if (attempts >= 1) {
+      // upprepad förlust trots lägre budget — nästa laddning kör CPU-motorn
+      sessionStorage.setItem("pf-gl-fallback", "cpu");
+    } else {
+      // första förlusten — ladda om på kvartsbudget (256²)
+      sessionStorage.setItem("pf-gl-downgrade", "1");
+    }
+    try {
+      this.loseExt?.restoreContext();
+    } catch {
+      // vissa drivrutiner tillåter inte manuell återställning
+    }
+    // fortfarande död efter en chans? ladda om till ett stabilt utgångsläge
+    setTimeout(() => {
+      const gl = this.canvas.getContext("webgl2");
+      if (!gl || gl.isContextLost()) location.reload();
+      else this.recovering = false;
+    }, 1200);
+  }
+
+  /** Punktstorlek + densitet skalas med partikelantalet så helheten ser lika ut. */
+  private renderTuning(): { size: number; density: number } {
+    if (this.size >= 512) return { size: 1.15, density: 0.4 };
+    if (this.size >= 384) return { size: 1.5, density: 0.55 };
+    return { size: 2.0, density: 0.8 };
   }
 
   private cachedShape(id: ShapeId): Float32Array {
@@ -395,7 +468,7 @@ export class GpgpuEngine implements EngineApi {
       blending: THREE.AdditiveBlending,
       uniforms: {
         uPosTex: { value: null },
-        uSize: { value: this.size === 512 ? 1.15 : 2.0 },
+        uSize: { value: this.renderTuning().size },
         uColor: { value: new THREE.Color("#7c6cff") },
         uWhite: { value: new THREE.Color("#e8e6ff") },
         uOpacity: { value: 0.42 },
@@ -562,7 +635,7 @@ export class GpgpuEngine implements EngineApi {
     (this.renderMat.uniforms.uWhite.value as THREE.Color).set(
       this.theme === "dark" ? preset.white : preset.whiteLight
     );
-    this.renderMat.uniforms.uSize.value = (this.size === 512 ? 1.15 : 2.0) * preset.size;
+    this.renderMat.uniforms.uSize.value = this.renderTuning().size * preset.size;
   }
 
   private holeStartSim = -1;
@@ -697,7 +770,7 @@ export class GpgpuEngine implements EngineApi {
 
   private tick = (): void => {
     requestAnimationFrame(this.tick);
-    if (!this.running) return;
+    if (!this.running || this.contextLost) return;
 
     const dt = Math.min(this.clock.getDelta(), 0.05);
     this.simTime += dt;
@@ -705,6 +778,10 @@ export class GpgpuEngine implements EngineApi {
     this.frameMs = this.frameMs * 0.92 + dt * 1000 * 0.08;
     this.fps = 1000 / Math.max(this.frameMs, 0.01);
     this.maybeDowngrade(dt);
+    // 30 s obruten drift ⇒ en engångsförlust ska inte straffa resten av sessionen
+    if (sessionStorage.getItem("pf-gl-recover") && this.simTime > 30) {
+      sessionStorage.removeItem("pf-gl-recover");
+    }
 
     const vu = this.velVar.material.uniforms;
     vu.uTime.value = t;
@@ -735,7 +812,7 @@ export class GpgpuEngine implements EngineApi {
 
     // färg + väderdimning — opaciteten skalas efter partikeldensitet
     (this.renderMat.uniforms.uColor.value as THREE.Color).lerp(this.targetColor, 0.04);
-    const density = this.size === 512 ? 0.4 : 0.8;
+    const density = this.renderTuning().density;
     const baseOpacity = SKIN_PRESETS[this.skin].opacity * density * (this.theme === "light" ? 1.55 : 1);
     const targetOpacity = baseOpacity * (1 - this.weatherDim * 0.5);
     this.renderMat.uniforms.uOpacity.value += (targetOpacity - this.renderMat.uniforms.uOpacity.value) * 0.05;
