@@ -104,6 +104,17 @@ const CSS = `
   color: var(--muted);
   white-space: pre;
 }
+.ast-count {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(4rem, 12vw, 8rem);
+  font-weight: 700;
+  color: var(--fg);
+  opacity: 0.85;
+  text-shadow: 0 0 40px var(--accent);
+}
 .ast-hud-quit {
   position: absolute;
   top: 4.2rem;
@@ -252,7 +263,8 @@ function launch(ctx: FeatureContext): void {
         y = (Math.random() * 2 - 1) * halfH;
         if (Math.hypot(x - ship.x, y - ship.y) > 2.6) break;
       }
-      asteroids.push(makeAsteroid(engine, 3, x, y, 1));
+      // våg 1 är lugnare — tempot trappas upp med vågorna
+      asteroids.push(makeAsteroid(engine, 3, x, y, Math.min(0.7 + wave * 0.1, 1.3)));
     }
   }
   spawnWave(START_AST);
@@ -397,6 +409,12 @@ function launch(ctx: FeatureContext): void {
   let frame = 0;
   let last = performance.now();
 
+  // nedräkning: 3-2-1 innan något rör sig — hinner läsa kontrollerna
+  const countEl = el("div", { class: "ast-count", "aria-hidden": "true" });
+  hud.append(countEl);
+  const startAt = performance.now() + 3400;
+  invulnUntil = startAt + INVULN_MS;
+
   function tick(now: number): void {
     if (!active) return;
     rafId = requestAnimationFrame(tick);
@@ -404,6 +422,17 @@ function launch(ctx: FeatureContext): void {
     last = now;
     frame++;
     const { halfW, halfH } = engine.worldBounds();
+
+    // frys spelet under nedräkningen — rita bara entiteterna stilla
+    if (now < startAt) {
+      const left = Math.ceil((startAt - now) / 1000);
+      const label = left > 3 ? "3" : String(left);
+      if (countEl.textContent !== label) countEl.textContent = label;
+      renderShip();
+      for (const a of asteroids) renderAsteroid(a);
+      return;
+    }
+    if (countEl.textContent) countEl.textContent = "";
 
     // skepp
     const turn = (keys.has("left") ? 1 : 0) - (keys.has("right") ? 1 : 0);

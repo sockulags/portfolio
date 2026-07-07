@@ -12,9 +12,9 @@ const VISITS_KEY = "pf-pix-visits";
 const SESSION_KEY = "pf-pix-session";
 const HATCHED_KEY = "pf-pix-hatched";
 
-const SPRING_K = 2;
+const SPRING_K = 1.4;
 const DAMPING = 0.9; // per frame vid 60 fps
-const MAX_SPEED = 2.5; // världsenheter/s
+const MAX_SPEED = 1.3; // världsenheter/s — Pix ska tassa, inte pila
 const CURIOSITY_RANGE = 3.5;
 const FOLLOW_GAP = 0.8;
 const EDGE_MARGIN = 0.12; // andel av viewportens fulla bredd/höjd

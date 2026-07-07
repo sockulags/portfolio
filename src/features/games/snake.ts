@@ -9,8 +9,8 @@ import { injectStyle, el } from "../../app/dom";
 const GRID = 14;
 const PARTICLES = 200;
 const FOOD_SLOT = PARTICLES - 1;
-const BASE_TICK = 140;
-const MIN_TICK = 90;
+const BASE_TICK = 165;
+const MIN_TICK = 95;
 const HI_KEY = "pf-snake-hi";
 
 const CSS = `
@@ -37,6 +37,20 @@ const CSS = `
 .snake-hint {
   color: var(--muted);
   font-size: 0.72rem;
+}
+.snake-count {
+  position: fixed;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 45;
+  font-family: var(--font-mono);
+  font-size: clamp(4rem, 12vw, 8rem);
+  font-weight: 700;
+  color: var(--fg);
+  opacity: 0.85;
+  text-shadow: 0 0 40px var(--accent);
+  pointer-events: none;
 }
 .snake-quit {
   position: absolute;
@@ -191,6 +205,8 @@ function setup(ctx: FeatureContext): void {
   const cleanup = (): void => {
     window.removeEventListener("keydown", onKey);
     window.clearTimeout(tickTimer);
+    window.clearInterval(countInterval);
+    countEl.remove();
     cancelAnimationFrame(raf);
     unsubLang();
     overlay.dispose();
@@ -242,7 +258,21 @@ function setup(ctx: FeatureContext): void {
     }
     tickTimer = window.setTimeout(tick, Math.max(MIN_TICK, BASE_TICK - score * 2));
   };
-  tickTimer = window.setTimeout(tick, BASE_TICK);
+  // nedräkning innan ormen kryper — hinner se brädet och läsa kontrollerna
+  const countEl = el("div", { class: "snake-count", "aria-hidden": "true" });
+  document.body.append(countEl);
+  let countdown = 3;
+  countEl.textContent = String(countdown);
+  const countInterval = window.setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+      window.clearInterval(countInterval);
+      countEl.remove();
+      tickTimer = window.setTimeout(tick, BASE_TICK);
+    } else {
+      countEl.textContent = String(countdown);
+    }
+  }, 1000);
 
   const onKey = (e: KeyboardEvent): void => {
     if ((e.target as HTMLElement).tagName === "INPUT") return;

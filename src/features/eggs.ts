@@ -48,18 +48,32 @@ export function initRunaway(ctx: FeatureContext): void {
     const y0 = 100 + Math.random() * (window.innerHeight - 300);
     const y1 = 100 + Math.random() * (window.innerHeight - 300);
     const cy = Math.min(y0, y1) - 120 - Math.random() * 160;
-    const dur = 34_000;
-    const start = performance.now();
+    // lugn vandring — man ska hinna upptäcka, förstå och jaga den
+    const dur = 55_000;
+    let u = 0;
+    let last = performance.now();
+    let pointerX = -1e4;
+    let pointerY = -1e4;
+    const onMove = (e: PointerEvent) => {
+      pointerX = e.clientX;
+      pointerY = e.clientY;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
 
     const step = (now: number) => {
-      const u = (now - start) / dur;
+      const dt = Math.min(now - last, 100);
+      last = now;
       if (u >= 1 || !dot) {
+        window.removeEventListener("pointermove", onMove);
         cleanup();
         schedule();
         return;
       }
       const x = (1 - u) * (1 - u) * x0 + 2 * (1 - u) * u * ((x0 + x1) / 2) + u * u * x1;
       const y = (1 - u) * (1 - u) * y0 + 2 * (1 - u) * u * cy + u * u * y1;
+      // tvekar nyfiket när pekaren närmar sig — retas, men låter sig fångas
+      const near = Math.hypot(x - pointerX, y - pointerY) < 140;
+      u += (dt / dur) * (near ? 0.3 : 1);
       dot.style.transform = `translate(${x}px, ${y}px)`;
       raf = requestAnimationFrame(step);
     };

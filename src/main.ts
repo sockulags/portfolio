@@ -355,7 +355,7 @@ function applySection(def: SectionDef): void {
     if (text && !spelled.has(def.id) && !reducedMotion) {
       spelled.add(def.id);
       session.setItem("pf-spelled", JSON.stringify([...spelled]));
-      engine.morphToText(text, 1600);
+      engine.morphToText(text, 2800);
     }
   }
   setAccent(def.accent);
@@ -609,7 +609,7 @@ initPhysicalCursor();
 if (!reducedMotion && !sessionStorage.getItem("pf-greeted")) {
   sessionStorage.setItem("pf-greeted", "1");
   setTimeout(() => {
-    if (currentSection.id === "hem" && !engine.paused) engine.morphToText("LUCAS SKOG", 2400);
+    if (currentSection.id === "hem" && !engine.paused) engine.morphToText("LUCAS SKOG", 3600);
   }, 900);
 }
 
