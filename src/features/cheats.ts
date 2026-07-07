@@ -28,6 +28,26 @@ const CHEATS: CheatDef[] = [
     toast: { sv: "Återställt.", en: "Back to normal." },
     run: (ctx) => applySkin(ctx, "default"),
   },
+  {
+    code: "void",
+    toast: { sv: "🕳 Släpp taget.", en: "🕳 Let go." },
+    run: (ctx) => ctx.engine.blackHole(),
+  },
+  {
+    code: "aurora",
+    toast: { sv: "☄ Himlen öppnar sig …", en: "☄ The sky opens …" },
+    run: (ctx) => ctx.bus.emit("cosmos-preview", { what: "aurora" }),
+  },
+  {
+    code: "orion",
+    toast: { sv: "✨ Stjärnfall!", en: "✨ Shooting stars!" },
+    run: (ctx) => ctx.bus.emit("cosmos-preview", { what: "meteor" }),
+  },
+  {
+    code: "iss",
+    toast: { sv: "🛰 Där uppe, just nu.", en: "🛰 Up there, right now." },
+    run: (ctx) => ctx.bus.emit("cosmos-preview", { what: "iss" }),
+  },
 ];
 
 const SKIN_LABEL: Record<SkinId, { sv: string; en: string }> = {

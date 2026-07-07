@@ -632,6 +632,8 @@ async function loadFeatureModules(): Promise<void> {
     ["pix", async () => ({ init: (await import("./features/pix")).initPix })],
     ["multiverse", async () => ({ init: (await import("./features/multiverse")).initMultiverse })],
     ["console-api", async () => ({ init: (await import("./features/console-api")).initConsoleApi })],
+    ["cosmos", async () => ({ init: (await import("./features/cosmos")).initCosmos })],
+    ["gamepad", async () => ({ init: (await import("./features/gamepad")).initGamepad })],
   ];
   await Promise.all(
     features.map(async ([name, load]) => {

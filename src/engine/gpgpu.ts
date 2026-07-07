@@ -74,6 +74,7 @@ uniform float uDrift;
 uniform float uFlowX;
 uniform vec4 uShock[4];
 uniform vec4 uVortex;
+uniform vec4 uHole;
 uniform sampler2D uTarget;
 
 ${NOISE_GLSL}
@@ -84,8 +85,19 @@ void main() {
   vec3 vel = texture2D(textureVelocity, uv).xyz;
   vec3 target = texture2D(uTarget, uv).xyz;
 
-  if (uGravity < 0.5) {
+  if (uGravity < 0.5 && uHole.w < 0.5) {
     vel += (target - pos) * uAttract * uDt;
+  }
+
+  // svart hål: inåtspiral mot singulariteten, skivan plattas mot z=0
+  if (uHole.w > 0.5) {
+    vec2 toC = uHole.xy - pos.xy;
+    float d = length(toC) + 0.02;
+    vec2 dir = toC / d;
+    vec2 tang = vec2(-dir.y, dir.x);
+    float s = uHole.z;
+    vel.xy += (dir * s * 1.7 / (0.25 + d) + tang * s * 1.2 / (0.15 + d)) * uDt;
+    vel.z -= pos.z * s * 0.9 * uDt;
   }
   vel += curlNoise(pos * uCurlScale + vec3(0.0, 0.0, uTime * 0.07)) * uCurlAmp * uDt;
   vel.x += uFlowX * uDt;
@@ -182,9 +194,11 @@ class Overlay implements OverlayApi {
   private geo: THREE.BufferGeometry;
   private mat: THREE.PointsMaterial;
   private scene: THREE.Scene;
+  private onDispose: (() => void) | null = null;
 
-  constructor(scene: THREE.Scene, count: number, size: number) {
+  constructor(scene: THREE.Scene, count: number, size: number, onDispose?: () => void) {
     this.scene = scene;
+    this.onDispose = onDispose ?? null;
     this.count = count;
     this.positions = new Float32Array(count * 3);
     this.colors = new Float32Array(count * 3);
@@ -210,12 +224,20 @@ class Overlay implements OverlayApi {
     this.points.visible = v;
   }
 
+  /** Additivt ljus syns inte på ljus botten — mörka ner via materialfärgen. */
+  applyTheme(mode: "dark" | "light"): void {
+    this.mat.blending = mode === "light" ? THREE.NormalBlending : THREE.AdditiveBlending;
+    this.mat.color.set(mode === "light" ? "#232340" : "#ffffff");
+    this.mat.needsUpdate = true;
+  }
+
   sync(): void {
     (this.geo.getAttribute("position") as THREE.BufferAttribute).needsUpdate = true;
     (this.geo.getAttribute("color") as THREE.BufferAttribute).needsUpdate = true;
   }
 
   dispose(): void {
+    this.onDispose?.();
     this.scene.remove(this.points);
     this.geo.dispose();
     this.mat.dispose();
@@ -341,6 +363,7 @@ export class GpgpuEngine implements EngineApi {
     vu.uFlowX = { value: 0 };
     vu.uShock = { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] };
     vu.uVortex = { value: new THREE.Vector4() };
+    vu.uHole = { value: new THREE.Vector4() };
     vu.uTarget = { value: this.targetTex };
 
     const pu = this.posVar.material.uniforms;
@@ -542,6 +565,22 @@ export class GpgpuEngine implements EngineApi {
     this.renderMat.uniforms.uSize.value = (this.size === 512 ? 1.15 : 2.0) * preset.size;
   }
 
+  private holeStartSim = -1;
+
+  blackHole(): void {
+    if (this.reducedMotion || this.holeStartSim >= 0 || this.paused) {
+      this.burst(1);
+      return;
+    }
+    this.morphToken++; // avbryt väntande morf-återställningar
+    // simtid (inte wall-clock): kollapsen ska spelas upp helt även om
+    // fliken göms mitt i — annars blir det bara en bang utan uppslukning
+    this.holeStartSim = this.simTime;
+    this.focusUntil = performance.now() + 8000; // centrera fältet under uppslukningen
+    const hole = this.velVar.material.uniforms.uHole.value as THREE.Vector4;
+    hole.set(0, 0, 0, 1);
+  }
+
   burst(tier: 1 | 2 | 3 = 1): void {
     if (tier === 1) {
       this.morphToPoints(shapes.scatter(4096), 900);
@@ -551,8 +590,13 @@ export class GpgpuEngine implements EngineApi {
     }
   }
 
+  private overlays = new Set<Overlay>();
+
   createOverlay(count: number, opts?: { size?: number }): OverlayApi {
-    return new Overlay(this.scene, count, opts?.size ?? 0.06);
+    const overlay: Overlay = new Overlay(this.scene, count, opts?.size ?? 0.06, () => this.overlays.delete(overlay));
+    overlay.applyTheme(this.theme);
+    this.overlays.add(overlay);
+    return overlay;
   }
 
   screenToWorld(clientX: number, clientY: number): { x: number; y: number } {
@@ -585,6 +629,7 @@ export class GpgpuEngine implements EngineApi {
     this.theme = mode;
     this.renderMat.blending = mode === "light" ? THREE.NormalBlending : THREE.AdditiveBlending;
     this.renderMat.needsUpdate = true;
+    this.overlays.forEach((o) => o.applyTheme(mode));
     this.applyColors();
   }
 
@@ -638,6 +683,7 @@ export class GpgpuEngine implements EngineApi {
     this.renderMat.dispose();
     this.targetTex.dispose();
     this.gpu.dispose();
+    this.holeStartSim = -1; // uHole återskapas nollad — glöm pågående kollaps
     this.size = size;
     this.initSim();
     this.initPoints();
@@ -667,6 +713,25 @@ export class GpgpuEngine implements EngineApi {
 
     this.gpu.compute();
     this.renderMat.uniforms.uPosTex.value = this.gpu.getCurrentRenderTarget(this.posVar).texture;
+
+    // svart hål: styrkan rampar upp under ~6 s simtid, sedan big bang.
+    // Startar ett spel mitt i kollapsen avbryts hålet tyst — ingen fantombang.
+    if (this.holeStartSim >= 0) {
+      const age = this.simTime - this.holeStartSim;
+      const hole = vu.uHole.value as THREE.Vector4;
+      if (this.paused) {
+        hole.set(0, 0, 0, 0);
+        this.holeStartSim = -1;
+      } else if (age < 6.2) {
+        hole.z = Math.min(3.6, age * 0.95);
+        this.focusUntil = performance.now() + 2000; // håll fältet centrerat
+      } else {
+        hole.set(0, 0, 0, 0);
+        this.holeStartSim = -1;
+        this.shockwaveWorld(0, 0, 4);
+        this.morphToPoints(shapes.scatter(4096), 1000);
+      }
+    }
 
     // färg + väderdimning — opaciteten skalas efter partikeldensitet
     (this.renderMat.uniforms.uColor.value as THREE.Color).lerp(this.targetColor, 0.04);

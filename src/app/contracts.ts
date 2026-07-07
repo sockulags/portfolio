@@ -56,6 +56,8 @@ export interface EngineApi {
   setWeather(w: { windX: number; windY: number; drift: number; dim: number } | null): void;
   setAccent(hex: string): void;
   burst(tier?: 1 | 2 | 3): void;
+  /** Svart hål: fältet spiralerar in i en singularitet och återföds i en big bang (~7 s). */
+  blackHole(): void;
   /** true ⇒ scrollspy får inte byta form (spel pågår). */
   paused: boolean;
   createOverlay(count: number, opts?: { size?: number }): OverlayApi;
@@ -78,6 +80,8 @@ export type BusEvents = {
   "game-end": { game: string; score: number };
   "skin-unlocked": { skin: SkinId };
   "audio-blip": { kind: "nav" | "open" | "secret" | "morph" | "shoot" | "hit" };
+  /** Förhandsvisa ett kosmiskt fenomen (fuskkoder/test) — cosmos-modulen lyssnar. */
+  "cosmos-preview": { what: "aurora" | "meteor" | "iss" };
 };
 
 export interface Bus {

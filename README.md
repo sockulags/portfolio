@@ -18,6 +18,12 @@ ingen spårning.
 - **Fysisk cursor** — klick skickar en chockvåg genom fältet, håll-och-dra skapar en virvel.
 - **Levande värld** — fältet påverkas av det verkliga vädret i Stockholm (open-meteo: vind,
   nederbörd, molnighet) och footern visar aktuellt väder + Kp-index för norrsken.
+- **Sajten tittar upp också** — när ISS faktiskt passerar över Stockholm glider en liten
+  partikel-ISS över fältet (wheretheiss.at), under riktiga meteorregn (Perseiderna,
+  Geminiderna …) faller stjärnfall, och vid Kp ≥ 5 nattetid böljar norrskensdraperier
+  över himlavalvet.
+- **Gamepad-stöd** — koppla in en handkontroll: navigera med styrkorset, spela Asteroids
+  med spakarna och känn varje träff genom rumble.
 
 ## Överdrivet funktionell
 
@@ -53,6 +59,7 @@ för den som hittar allt. Utan att avslöja för mycket:
 - Något kläcks när du hittat din första hemlighet — det bor i hörnet, följer muspekaren och
   sover nattetid (Stockholmstid)
 - Sajten vet när du är uppe sent
+- Det finns ett ord som får hela galaxen att kollapsa i en singularitet — och återfödas
 
 ## Utveckling
 

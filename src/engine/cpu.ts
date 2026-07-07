@@ -50,9 +50,11 @@ class Overlay implements OverlayApi {
   private geo: THREE.BufferGeometry;
   private mat: THREE.PointsMaterial;
   private scene: THREE.Scene;
+  private onDispose: (() => void) | null = null;
 
-  constructor(scene: THREE.Scene, count: number, size: number) {
+  constructor(scene: THREE.Scene, count: number, size: number, onDispose?: () => void) {
     this.scene = scene;
+    this.onDispose = onDispose ?? null;
     this.count = count;
     this.positions = new Float32Array(count * 3);
     this.colors = new Float32Array(count * 3);
@@ -78,12 +80,20 @@ class Overlay implements OverlayApi {
     this.points.visible = v;
   }
 
+  /** Additivt ljus syns inte på ljus botten — mörka ner via materialfärgen. */
+  applyTheme(mode: "dark" | "light"): void {
+    this.mat.blending = mode === "light" ? THREE.NormalBlending : THREE.AdditiveBlending;
+    this.mat.color.set(mode === "light" ? "#232340" : "#ffffff");
+    this.mat.needsUpdate = true;
+  }
+
   sync(): void {
     (this.geo.getAttribute("position") as THREE.BufferAttribute).needsUpdate = true;
     (this.geo.getAttribute("color") as THREE.BufferAttribute).needsUpdate = true;
   }
 
   dispose(): void {
+    this.onDispose?.();
     this.scene.remove(this.points);
     this.geo.dispose();
     this.mat.dispose();
@@ -276,8 +286,36 @@ export class CpuEngine implements EngineApi {
     this.morphToPoints(shapes.scatter(4096), 900);
   }
 
+  private holeActive = false;
+
+  blackHole(): void {
+    // samma vakter som GPGPU-motorn: spel/reducerad rörelse får bara en burst
+    if (this.reducedMotion || this.paused || this.holeActive) {
+      this.burst();
+      return;
+    }
+    this.holeActive = true;
+    setTimeout(() => (this.holeActive = false), 2800);
+    // CPU-approximation: kollapsa till en tät kärna, explodera sedan
+    const core = new Float32Array(600 * 3);
+    for (let i = 0; i < 600; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.random() * 0.35;
+      core[i * 3] = Math.cos(a) * r;
+      core[i * 3 + 1] = Math.sin(a) * r * 0.4;
+      core[i * 3 + 2] = (Math.random() - 0.5) * 0.1;
+    }
+    this.morphToPoints(core, 2600);
+    setTimeout(() => this.burst(), 2700);
+  }
+
+  private overlays = new Set<Overlay>();
+
   createOverlay(count: number, opts?: { size?: number }): OverlayApi {
-    return new Overlay(this.scene, count, opts?.size ?? 0.06);
+    const overlay: Overlay = new Overlay(this.scene, count, opts?.size ?? 0.06, () => this.overlays.delete(overlay));
+    overlay.applyTheme(this.theme);
+    this.overlays.add(overlay);
+    return overlay;
   }
 
   screenToWorld(clientX: number, clientY: number): { x: number; y: number } {
@@ -308,6 +346,7 @@ export class CpuEngine implements EngineApi {
     this.theme = mode;
     this.material.blending = mode === "light" ? THREE.NormalBlending : THREE.AdditiveBlending;
     this.material.needsUpdate = true;
+    this.overlays.forEach((o) => o.applyTheme(mode));
     this.applyColors();
   }
 
