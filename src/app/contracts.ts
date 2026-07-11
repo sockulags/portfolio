@@ -10,6 +10,7 @@ export type ShapeId =
   | "lattice"
   | "wave"
   | "blob"
+  | "lanes"
   | "ring"
   | "scatter";
 
@@ -79,7 +80,13 @@ export type BusEvents = {
   "game-start": { game: string };
   "game-end": { game: string; score: number };
   "skin-unlocked": { skin: SkinId };
-  "audio-blip": { kind: "nav" | "open" | "secret" | "morph" | "shoot" | "hit" };
+  "audio-blip": { kind: "nav" | "open" | "secret" | "morph" | "shoot" | "hit" | "warp" };
+  /** Äventyrs-/klassiskt läge har växlats. */
+  mode: { mode: "journey" | "classic" };
+  /** Alla stopp på resan besökta (via Play-turen eller på egen hand). */
+  "journey-complete": Record<string, never>;
+  /** Hemligheterna nollställdes (speedrun) — räknare och märken måste ritas om. */
+  "secrets-reset": Record<string, never>;
   /** Förhandsvisa ett kosmiskt fenomen (fuskkoder/test) — cosmos-modulen lyssnar. */
   "cosmos-preview": { what: "aurora" | "meteor" | "iss" };
 };
@@ -101,7 +108,11 @@ export type SecretId =
   | "chameleon"
   | "terminal"
   | "hire"
-  | "multiverse";
+  | "multiverse"
+  | "first-warp"
+  | "free-flight"
+  | "moon-rep"
+  | "moon-stege";
 
 export interface SecretsApi {
   /** Registrera fynd. No-op om redan hittad. Visar toast + emitterar 'secret'. */
@@ -109,8 +120,15 @@ export interface SecretsApi {
   has(id: SecretId): boolean;
   count(): number;
   total(): number;
-  /** För runtavlan: alla hemligheter med status + kryptisk ledtråd. */
-  list(): { id: SecretId; found: boolean; hint: { sv: string; en: string } }[];
+  /** För uppdragsloggen: alla hemligheter med status, namn och ledtrådar.
+   *  hint2 är den tydligare ledtråden — saknas den är uppdraget kryptiskt-only. */
+  list(): {
+    id: SecretId;
+    found: boolean;
+    name: { sv: string; en: string };
+    hint: { sv: string; en: string };
+    hint2?: { sv: string; en: string };
+  }[];
   reset(): void;
 }
 

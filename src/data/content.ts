@@ -107,40 +107,69 @@ export const projects: Project[] = [
     accent: "#f72585",
   },
   {
-    id: "rep-counter",
+    id: "viska",
     index: "04",
-    name: "Rep Counter",
+    name: "Viska",
     tagline: {
-      sv: "PWA för daglig träningsloggning",
-      en: "PWA for daily exercise logging",
+      sv: "Diktering var som helst i Windows — utan moln",
+      en: "Dictation anywhere on Windows — no cloud",
     },
     description: {
-      sv: "En mobilanpassad PWA för att logga repetitioner — snabbknappar, dagliga mål, aktivitetskarta och periodfilter. All data stannar lokalt på enheten. Installeras på hemskärmen och fungerar offline.",
-      en: "A mobile-first PWA for logging reps — quick buttons, daily goals, an activity heatmap and period filters. All data stays local on the device. Installs to the home screen and works offline.",
+      sv: "Tryck F9 och prata — texten skrivs in där markören står, i vilken Windows-app som helst. Kungliga bibliotekets svensktränade KB-Whisper kör på din egen GPU: ljudet lämnar aldrig datorn och transkriberingen tar under en sekund.",
+      en: "Press F9 and speak — the text lands wherever the cursor is, in any Windows app. The Royal Library's Swedish-trained KB-Whisper runs on your own GPU: audio never leaves the machine and transcription takes under a second.",
     },
     highlights: {
       sv: [
-        "Blixtsnabb loggning med snabbknappar och karusell för aktiva övningar.",
-        "Översikt med heatmap, dagstotaler och redigerbara poster.",
-        "Ingen server, inget konto — lokal lagring med full återställning.",
+        "Liveläge på GPU: färdiga fraser skrivs in medan du fortfarande pratar — den pågående förhandsvisas i en pill nertill.",
+        "F8 polerar markerad text med en lokal Qwen3-modell — mallbibliotek (Mejl, Commit-text) och egen profil per app.",
+        "Integritet i detaljerna: inklistringar hålls utanför Win+V-historiken och molnklippbordet, historiken bor i RAM.",
       ],
       en: [
-        "Lightning-fast logging with quick buttons and an active-exercise carousel.",
-        "Overview with heatmap, daily totals and editable entries.",
-        "No server, no account — local storage with full reset support.",
+        "Live mode on GPU: finished phrases are typed while you're still speaking — the current one previews in a pill at the bottom.",
+        "F8 polishes selected text with a local Qwen3 model — a template library (Email, Commit message) and per-app profiles.",
+        "Privacy in the details: pasted text stays out of the Win+V history and cloud clipboard; history lives in RAM.",
       ],
     },
-    tech: ["TypeScript", "PWA", "Service Worker", "GitHub Actions", "GitHub Pages"],
-    status: { sv: "Live", en: "Live" },
-    links: [
-      { label: { sv: "Testa live", en: "Try it live" }, href: "https://sockulags.github.io/rep-counter/" },
-      { label: { sv: "Kod på GitHub", en: "Code on GitHub" }, href: "https://github.com/sockulags/rep-counter" },
-    ],
+    tech: ["Python", "faster-whisper", "KB-Whisper", "llama.cpp", "CUDA", "PyInstaller"],
+    status: { sv: "Privat beta", en: "Private beta" },
+    links: [],
     accent: "#80ed99",
   },
   {
-    id: "smask",
+    id: "referat",
     index: "05",
+    name: "referat",
+    tagline: {
+      sv: "Mötesprotokoll som aldrig lämnar datorn",
+      en: "Meeting minutes that never leave your machine",
+    },
+    description: {
+      sv: "Slut på att anteckna medan alla andra pratar: referat spelar in mötet, transkriberar och skriver färdigt protokoll — sammanfattning, beslut och åtgärdspunkter. Allt lagras lokalt, API-nycklar krypteras med Windows DPAPI och appen ringer aldrig hem.",
+      en: "No more taking notes while everyone else talks: referat records the meeting, transcribes it and writes finished minutes — summary, decisions and action items. Everything is stored locally, API keys are encrypted with Windows DPAPI and the app never phones home.",
+    },
+    highlights: {
+      sv: [
+        "Fångar systemljud och mikrofon direkt — fungerar med Teams, Zoom och Meet utan att någon bot går med i samtalet.",
+        "Talardiarisering via lokal pyannote-server: vem sa vad — en timmes möte diariseras på under en minut på GPU.",
+        "Välj var AI:n kör — KB-Whisper och Ollama helt lokalt, eller valfri OpenAI-kompatibel/Anthropic-endpoint.",
+      ],
+      en: [
+        "Captures system audio and microphone directly — works with Teams, Zoom and Meet without a bot joining the call.",
+        "Speaker diarization via a local pyannote server: who said what — an hour-long meeting diarizes in under a minute on GPU.",
+        "Choose where the AI runs — KB-Whisper and Ollama fully local, or any OpenAI-compatible/Anthropic endpoint.",
+      ],
+    },
+    tech: ["Electron", "React 19", "TypeScript", "Tailwind 4", "Python", "pyannote.audio"],
+    status: { sv: "Öppen källkod", en: "Open source" },
+    links: [
+      { label: { sv: "Kod på GitHub", en: "Code on GitHub" }, href: "https://github.com/sockulags/referat" },
+      { label: { sv: "Ladda ner appen", en: "Download the app" }, href: "https://sockulags.github.io/referat/" },
+    ],
+    accent: "#ffd166",
+  },
+  {
+    id: "smask",
+    index: "06",
     name: "Smask!",
     tagline: {
       sv: "Familjens kokbok — testade och godkända recept",
@@ -169,6 +198,51 @@ export const projects: Project[] = [
   },
 ];
 
+/** Små sidoprojekt som kretsar kring en planet på rutten — upptäcks, öppnas, räknas som hemlighet. */
+export interface Moon {
+  id: string;
+  /** Sektions-id som månen kretsar kring. */
+  host: string;
+  secretId: "moon-rep" | "moon-stege";
+  name: string;
+  tagline: { sv: string; en: string };
+  description: { sv: string; en: string };
+  liveUrl: string;
+  repoUrl: string;
+  accent: string;
+}
+
+export const moons: Moon[] = [
+  {
+    id: "stege",
+    host: "design-pilot",
+    secretId: "moon-stege",
+    name: "Stege",
+    tagline: { sv: "En schackstege med 498 pinnar", en: "A chess ladder with 498 rungs" },
+    description: {
+      sv: "Klättra från nybörjarlätt till 2900 ELO — inga ledtrådar, ett felsteg och pusslet nollställs. Time trial öser ur 19 000 Lichess-pussel, allt serverat helt utan backend.",
+      en: "Climb from beginner-easy to 2900 ELO — no hints, one misstep and the puzzle resets. Time trial draws from 19,000 Lichess puzzles, all served with zero backend.",
+    },
+    liveUrl: "https://sockulags.github.io/stege/",
+    repoUrl: "https://github.com/sockulags/stege",
+    accent: "#bdb2ff",
+  },
+  {
+    id: "rep-counter",
+    host: "smask",
+    secretId: "moon-rep",
+    name: "Rep Counter",
+    tagline: { sv: "Varje rep räknas — lokalt", en: "Every rep counts — locally" },
+    description: {
+      sv: "Blixtsnabb rep-loggning direkt från hemskärmen: snabbknappar, dagsmål och en heatmap som skvallrar om vilodagarna. Ingen server, inget konto — datan bor i din ficka.",
+      en: "Lightning-fast rep logging straight from the home screen: quick buttons, daily goals and a heatmap that tattles on your rest days. No server, no account — the data lives in your pocket.",
+    },
+    liveUrl: "https://sockulags.github.io/rep-counter/",
+    repoUrl: "https://github.com/sockulags/rep-counter",
+    accent: "#ff9770",
+  },
+];
+
 export const ui = {
   role: {
     sv: "Fullstackutvecklare",
@@ -181,7 +255,8 @@ export const ui = {
   greetingMorning: { sv: "God morgon", en: "Good morning" },
   greetingDay: { sv: "Hej", en: "Hello" },
   greetingEvening: { sv: "God kväll", en: "Good evening" },
-  scrollHint: { sv: "Scrolla — eller tryck", en: "Scroll — or press" },
+  scrollHint: { sv: "Scrolla, spring med WASD — eller warpa med", en: "Scroll, run with WASD — or warp with" },
+  playJourney: { sv: "Starta resan", en: "Begin the journey" },
   selectedWork: { sv: "Utvalda projekt", en: "Selected work" },
   contactTitle: { sv: "Hör av dig", en: "Get in touch" },
   contactBody: {
@@ -214,8 +289,10 @@ export const ui = {
   shortcutsHelp: { sv: "Visa denna hjälp", en: "Show this help" },
   shortcutsClose: { sv: "Stäng överlägg", en: "Close overlay" },
   shortcutsAudio: { sv: "Ljud på/av", en: "Sound on/off" },
-  shortcutsDebug: { sv: "Debug-HUD", en: "Debug HUD" },
+  shortcutsDebug: { sv: "Debug-HUD (klassisk vy — D styr skeppet i äventyret)", en: "Debug HUD (classic view — D steers the ship in the journey)" },
   shortcutsTerminal: { sv: "Öppna terminalen", en: "Open the terminal" },
+  shortcutsWasd: { sv: "Spring genom rymden (äventyrsläge)", en: "Run through space (journey mode)" },
+  shortcutsQuestlog: { sv: "Uppdragsloggen", en: "The quest log" },
   shortcutsPrint: { sv: "Skriv ut som riktigt CV", en: "Print as a real CV" },
   status: { sv: "Status", en: "Status" },
   privateRepo: { sv: "Privat repo", en: "Private repo" },

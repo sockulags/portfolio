@@ -16,6 +16,10 @@ import { initRuneboard } from "./features/runeboard";
 import { initDiploma } from "./features/diploma";
 import { initIdle } from "./features/idle";
 import { initNarrator } from "./features/narrator";
+import { initJourney } from "./features/journey";
+import { initIntro } from "./features/intro";
+import { initTour } from "./features/tour";
+import { initMoons } from "./features/moons";
 
 const EMAIL = "lucasskog@gmail.com";
 const GITHUB_USER = "sockulags";
@@ -36,7 +40,8 @@ export function shapeFor(id: string): ShapeId {
     meritvo: "layers",
     pilot: "knot",
     "design-pilot": "lattice",
-    "rep-counter": "wave",
+    viska: "wave",
+    referat: "lanes",
     smask: "blob",
     kontakt: "ring",
   };
@@ -180,8 +185,11 @@ function render(): void {
           <p class="hero-greeting mono">${greeting()} — ${t(ui.role).toLowerCase()}</p>
           <h1 class="hero-name">Lucas<br /><span class="hero-name-accent">Skog</span></h1>
           <p class="hero-line">${t(ui.heroLine)}</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="play-btn" data-hover>▶ ${t(ui.playJourney)}</button>
+          </div>
           <p class="hero-pulse mono" data-github-pulse></p>
-          <p class="hero-hint mono">${t(ui.scrollHint)} <kbd>1</kbd>–<kbd>5</kbd></p>
+          <p class="hero-hint mono">${t(ui.scrollHint)} <kbd>1</kbd>–<kbd>${projects.length}</kbd></p>
         </div>
       </section>
 
@@ -219,7 +227,9 @@ function render(): void {
         <h3>${t(ui.shortcuts)}</h3>
         <dl>
           <div><dt><kbd>Ctrl</kbd>+<kbd>K</kbd></dt><dd>${t(ui.shortcutsPalette)}</dd></div>
-          <div><dt><kbd>1</kbd>–<kbd>5</kbd></dt><dd>${t(ui.shortcutsSections)}</dd></div>
+          <div><dt><kbd>1</kbd>–<kbd>${projects.length}</kbd></dt><dd>${t(ui.shortcutsSections)}</dd></div>
+          <div><dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>${t(ui.shortcutsWasd)}</dd></div>
+          <div><dt><kbd>J</kbd></dt><dd>${t(ui.shortcutsQuestlog)}</dd></div>
           <div><dt><kbd>T</kbd></dt><dd>${t(ui.shortcutsTheme)}</dd></div>
           <div><dt><kbd>L</kbd></dt><dd>${t(ui.shortcutsLang)}</dd></div>
           <div><dt><kbd>M</kbd></dt><dd>${t(ui.shortcutsAudio)}</dd></div>
@@ -245,7 +255,16 @@ function bind(): void {
   document.querySelector("#lang-btn")!.addEventListener("click", toggleLang);
   document.querySelector("#theme-btn")!.addEventListener("click", (e) => toggleTheme(e as MouseEvent));
   document.querySelector("#palette-btn")!.addEventListener("click", () => palette.open());
+  document.querySelector("#play-btn")!.addEventListener("click", () => runCommand("tour-start"));
   document.querySelector("#copy-email")!.addEventListener("click", copyEmail);
+  // i äventyrsläget flyger skeppet till pricken i stället för att hoppa dit
+  document.querySelectorAll<HTMLAnchorElement>(".dot").forEach((dot) => {
+    dot.addEventListener("click", (e) => {
+      if (!document.body.classList.contains("mode-journey")) return;
+      e.preventDefault();
+      void journey.warpTo(dot.dataset.section!);
+    });
+  });
   document.querySelector<HTMLElement>("#help-overlay")!.addEventListener("pointerdown", (e) => {
     if ((e.target as HTMLElement).id === "help-overlay") toggleHelp(false);
   });
@@ -341,7 +360,8 @@ const TEXT_MORPHS: Record<string, string> = {
   meritvo: "MERITVO",
   pilot: "PILOT",
   "design-pilot": "DESIGN-PILOT",
-  "rep-counter": "REP COUNTER",
+  viska: "VISKA",
+  referat: "REFERAT",
   smask: "SMASK!",
 };
 const spelled = new Set<string>(readJsonArray<string>(session, "pf-spelled"));
@@ -511,14 +531,31 @@ window.addEventListener("keydown", (e) => {
     if (typing) return;
   }
 
+  // i äventyrsläget ägs WASD av löpningen — släpp inte D vidare till debug-HUD:en
+  const journeyActive = document.body.classList.contains("mode-journey");
+  if (journeyActive && ["w", "a", "s", "d"].includes(e.key.toLowerCase())) return;
+  // modala dialoger äger tangentbordet — inga sektionshopp bakom dem
+  if (document.querySelector(".runeboard-overlay.is-open, .moon-overlay.is-open")) return;
+
+  // reduced motion kan aldrig flyga — fast tracks är deras väg till warp-hemligheten
+  const fastTrack = (id: string) => {
+    if (journeyActive) void journey.warpTo(id);
+    else {
+      goTo(id);
+      if (reducedMotion) secrets.found("first-warp");
+    }
+  };
+
   const n = Number(e.key);
-  if (n >= 1 && n <= projects.length) goTo(projects[n - 1].id);
-  else if (e.key === "0") goTo("hem");
-  else if (e.key.toLowerCase() === "c") goTo("kontakt");
+  if (n >= 1 && n <= projects.length) fastTrack(projects[n - 1].id);
+  else if (e.key === "0") fastTrack("hem");
+  else if (e.key.toLowerCase() === "c") fastTrack("kontakt");
   else if (e.key.toLowerCase() === "t") toggleTheme();
   else if (e.key.toLowerCase() === "l") toggleLang();
   else if (e.key.toLowerCase() === "m") runCommand("audio-toggle");
   else if (e.key.toLowerCase() === "d") runCommand("debug");
+  else if (e.key.toLowerCase() === "j") runCommand("runeboard");
+  else if (e.key.toLowerCase() === "p") runCommand("tour-start");
   else if (e.key === ">") runCommand("terminal");
   else if (e.key === "?") toggleHelp();
 });
@@ -605,8 +642,25 @@ initCalendar(ctx);
 initIdle(ctx, () => applySection(currentSection));
 initPhysicalCursor();
 
-// partiklarna hälsar välkommen — en gång per session
-if (!reducedMotion && !sessionStorage.getItem("pf-greeted")) {
+// äventyrslagret: cockpit + warp + WASD, guidad tur, månar och ombordstigning
+const journey = initJourney(ctx, {
+  onArrive: (id) => {
+    const def = sections.find((s) => s.id === id);
+    if (def) applySection(def);
+  },
+  // avbruten warp: scrollspyn uppdaterade currentSection medan motorn var
+  // pausad — kör om applySection så formen kommer ikapp
+  onCancel: () => applySection(currentSection),
+});
+initTour(ctx, { journey });
+initMoons(ctx);
+const intro = initIntro(ctx, { journeyActive: () => journey.active() });
+
+if (intro.willAutoplay) {
+  sessionStorage.setItem("pf-greeted", "1");
+  setTimeout(() => void intro.play(), 700);
+} else if (!reducedMotion && !sessionStorage.getItem("pf-greeted")) {
+  // partiklarna hälsar välkommen — en gång per session
   sessionStorage.setItem("pf-greeted", "1");
   setTimeout(() => {
     if (currentSection.id === "hem" && !engine.paused) engine.morphToText("LUCAS SKOG", 3600);

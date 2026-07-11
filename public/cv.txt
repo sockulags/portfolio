@@ -38,14 +38,22 @@ Design-Pilot — Site builder with canvas and CLI (in development)
   * AI assistant via a local proxy — the API key never leaves the machine.
   Tech: TypeScript, React, Vite, Node CLI, pnpm workspaces, Anthropic API
 
-Rep Counter — PWA for daily exercise logging (live)
-  * Lightning-fast logging with quick buttons and an active-exercise
-    carousel.
-  * Overview with heatmap, daily totals and editable entries.
-  * No server, no account — local storage with full reset support.
-  Tech: TypeScript, PWA, Service Worker, GitHub Actions, GitHub Pages
-  Live: https://sockulags.github.io/rep-counter/
-  Code: https://github.com/sockulags/rep-counter
+Viska — Dictation anywhere on Windows, no cloud (private beta)
+  * Press F9 and speak — Swedish-trained KB-Whisper runs on a local
+    GPU and types wherever the cursor is, in any Windows app.
+  * Live mode commits finished phrases while you are still speaking.
+  * F8 polishes selected text with a local Qwen3 model — templates
+    and per-app profiles. Audio never leaves the machine.
+  Tech: Python, faster-whisper, KB-Whisper, llama.cpp, CUDA, PyInstaller
+
+referat — Meeting minutes that never leave your machine (open source)
+  * Captures system audio and microphone directly — works with Teams,
+    Zoom and Meet without a bot joining the call.
+  * Speaker diarization via a local pyannote server: who said what.
+  * Choose where the AI runs — fully local via KB-Whisper and Ollama,
+    or any OpenAI-compatible/Anthropic endpoint.
+  Tech: Electron, React 19, TypeScript, Tailwind 4, Python, pyannote.audio
+  Code: https://github.com/sockulags/referat
 
 Smask! — The family cookbook: tested and approved recipes (private beta)
   * AI ingestion: photograph a cookbook page, paste a link or dictate
@@ -55,6 +63,15 @@ Smask! — The family cookbook: tested and approved recipes (private beta)
   * Image pipeline with three webp variants and portion scaling right
     in the recipe view.
   Tech: Next.js 16, React 19, Tailwind 4, Supabase, Anthropic API, sharp
+
+SIDE PROJECTS
+------------------------------------------------------------------------
+Stege — chess-puzzle PWA: 498-level climber ladder + time trial over
+  19,000 Lichess puzzles, zero backend.
+  Live: https://sockulags.github.io/stege/
+Rep Counter — PWA for daily rep logging: quick buttons, goals and a
+  heatmap; all data stays on the device.
+  Live: https://sockulags.github.io/rep-counter/
 
 TECHNICAL BREADTH
 ------------------------------------------------------------------------

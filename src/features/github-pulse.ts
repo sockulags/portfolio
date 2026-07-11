@@ -8,7 +8,7 @@ import { injectStyle } from "../app/dom";
 
 const CACHE_KEY = "pf-gh";
 const MAX_AGE_MS = 10 * 60 * 1000;
-const TRACKED_REPOS = ["pilot", "rep-counter", "portfolio"];
+const TRACKED_REPOS = ["pilot", "referat", "stege", "rep-counter", "portfolio"];
 
 interface PulseEvent {
   type: string;

@@ -54,15 +54,26 @@
       "type": "application"
     },
     {
-      "name": "Rep Counter",
-      "description": "PWA for daily exercise logging. A mobile-first PWA for logging reps — quick buttons, daily goals, an activity heatmap and period filters. All data stays local on the device. Installs to the home screen and works offline. Live.",
+      "name": "Viska",
+      "description": "Dictation anywhere on Windows — no cloud. Press F9 and speak: Swedish-trained KB-Whisper runs on a local GPU and types wherever the cursor is, in any Windows app. Audio never leaves the machine and transcription takes under a second. Private beta.",
       "highlights": [
-        "Lightning-fast logging with quick buttons and an active-exercise carousel.",
-        "Overview with heatmap, daily totals and editable entries.",
-        "No server, no account — local storage with full reset support."
+        "Live mode on GPU: finished phrases are typed while you're still speaking.",
+        "F8 polishes selected text with a local Qwen3 model — template library and per-app profiles.",
+        "Privacy in the details: pasted text stays out of the Win+V history and cloud clipboard."
       ],
-      "keywords": ["TypeScript", "PWA", "Service Worker", "GitHub Actions", "GitHub Pages"],
-      "url": "https://sockulags.github.io/rep-counter/",
+      "keywords": ["Python", "faster-whisper", "KB-Whisper", "llama.cpp", "CUDA", "PyInstaller"],
+      "type": "application"
+    },
+    {
+      "name": "referat",
+      "description": "Meeting minutes that never leave your machine. Records the meeting, transcribes it and writes finished minutes — summary, decisions and action items. Everything stored locally, API keys encrypted with Windows DPAPI. Open source.",
+      "highlights": [
+        "Captures system audio and microphone directly — no bot joins the call.",
+        "Speaker diarization via a local pyannote server: who said what.",
+        "Choose where the AI runs — fully local, or any OpenAI-compatible/Anthropic endpoint."
+      ],
+      "keywords": ["Electron", "React 19", "TypeScript", "Tailwind 4", "Python", "pyannote.audio"],
+      "url": "https://github.com/sockulags/referat",
       "type": "application"
     },
     {
@@ -74,6 +85,20 @@
         "Image pipeline with three webp variants and portion scaling right in the recipe view."
       ],
       "keywords": ["Next.js 16", "React 19", "Tailwind 4", "Supabase", "Anthropic API", "sharp"],
+      "type": "application"
+    },
+    {
+      "name": "Stege",
+      "description": "Chess-puzzle PWA — a 498-level climber ladder plus time trial over 19,000 Lichess puzzles, zero backend. Live.",
+      "keywords": ["TypeScript", "PWA", "GitHub Pages"],
+      "url": "https://sockulags.github.io/stege/",
+      "type": "application"
+    },
+    {
+      "name": "Rep Counter",
+      "description": "Mobile-first PWA for logging exercise reps — quick buttons, daily goals, an activity heatmap. All data stays on the device. Live.",
+      "keywords": ["TypeScript", "PWA", "Service Worker"],
+      "url": "https://sockulags.github.io/rep-counter/",
       "type": "application"
     }
   ],

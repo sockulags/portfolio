@@ -300,8 +300,12 @@ kbd {
   color: var(--muted);
 }
 
+.hero-actions {
+  margin-top: 2rem;
+}
+
 .hero-hint {
-  margin-top: 3.5rem;
+  margin-top: 2.6rem;
   color: var(--muted);
   animation: bob 2.6s ease-in-out infinite;
 }

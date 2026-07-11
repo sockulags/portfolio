@@ -7,10 +7,16 @@ Portfolio: https://sockulags.github.io/portfolio/
 ## Projects
 
 - [Pilot](https://github.com/sockulags/pilot): Local-first AI agent that verifies its own work — runs fully local on Windows via Ollama, gathers evidence before answering, ships a reproducible eval suite. Open source (Python, FastAPI, MCP).
-- [Rep Counter](https://github.com/sockulags/rep-counter): Mobile-first PWA for logging exercise reps — quick buttons, daily goals, activity heatmap; all data stays on the device. Live at https://sockulags.github.io/rep-counter/ (TypeScript, Service Worker).
 - [Meritvo](https://sockulags.github.io/portfolio/#meritvo): AI-assisted CV platform — experience stored once in a language-neutral masterdata model, every AI edit goes through a review queue. Private beta (Next.js, PostgreSQL, OpenAI).
 - [Design-Pilot](https://sockulags.github.io/portfolio/#design-pilot): shadcn-inspired site builder — a Figma-like canvas rendering real React components plus a CLI that copies production-ready code into your project. In development, private (TypeScript, React, Anthropic API).
+- [Viska](https://sockulags.github.io/portfolio/#viska): Dictation anywhere on Windows, no cloud — press F9 and Swedish-trained KB-Whisper on a local GPU types where the cursor is; F8 polishes selected text with a local Qwen3 model. Private beta (Python, faster-whisper, CUDA).
+- [referat](https://github.com/sockulags/referat): Meeting minutes that never leave your machine — records system audio + mic, transcribes with speaker diarization via a local pyannote server, writes finished minutes. Open source (Electron, React, Python).
 - [Smask!](https://sockulags.github.io/portfolio/#smask): The family cookbook — stores recipes the family actually cooked, with AI ingestion (photo, link or voice) and a merged shopping list. Private beta (Next.js, Supabase, Anthropic API).
+
+## Side projects
+
+- [Stege](https://sockulags.github.io/stege/): Chess-puzzle PWA — a 498-level climber ladder plus time trial over 19,000 Lichess puzzles, zero backend.
+- [Rep Counter](https://sockulags.github.io/rep-counter/): Mobile-first PWA for logging exercise reps — quick buttons, daily goals, activity heatmap; all data stays on the device.
 
 ## Contact
 

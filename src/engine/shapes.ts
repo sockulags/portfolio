@@ -110,6 +110,23 @@ export const shapes: Record<ShapeId, ShapeFn> = {
     return p;
   },
 
+  // referat: talarspår — horisontella banor där yttranden klumpar sig
+  lanes(count) {
+    const p = new Float32Array(count * 3);
+    const laneCount = 4;
+    for (let i = 0; i < count; i++) {
+      const lane = i % laneCount;
+      // varje spår har sina egna "yttranden": kluster längs x med tysta luckor
+      const seg = Math.floor(Math.random() * 5);
+      const segCenter = -2.6 + seg * 1.3 + ((lane * 37 + seg * 61) % 10) * 0.06;
+      const segLen = 0.35 + ((lane * 13 + seg * 29) % 8) * 0.07;
+      p[i * 3] = segCenter + gauss() * segLen;
+      p[i * 3 + 1] = (lane - (laneCount - 1) / 2) * 0.95 + gauss() * 0.07;
+      p[i * 3 + 2] = gauss() * 0.25;
+    }
+    return p;
+  },
+
   // Kontakt: ring — öppen förbindelse
   ring(count) {
     const p = new Float32Array(count * 3);

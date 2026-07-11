@@ -18,8 +18,12 @@ const DESCRIPTIONS: Record<string, { sv: string; en: string }> = {
     en: "The particles form a three-dimensional cube lattice — the component registry of Design-Pilot.",
   },
   wave: {
-    sv: "Partiklarna svänger i pulserande vågrader — repetitioner och puls, som i Rep Counter.",
-    en: "The particles swing in pulsing wave rows — repetitions and pulse, like Rep Counter.",
+    sv: "Partiklarna svänger i pulserande vågrader — en röst som talar, som i dikteringsverktyget Viska.",
+    en: "The particles swing in pulsing wave rows — a voice speaking, like the dictation tool Viska.",
+  },
+  lanes: {
+    sv: "Partiklarna radar upp sig i talarspår med kluster av yttranden — mötestranskribering i referat.",
+    en: "The particles line up in speaker lanes with clusters of utterances — meeting transcription in referat.",
   },
   blob: {
     sv: "Partiklarna har samlats i en organisk, nästan ätbar form — familjekokboken Smask.",

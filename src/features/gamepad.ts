@@ -6,7 +6,7 @@
  */
 import type { FeatureContext } from "../app/contracts";
 
-const SECTIONS = ["hem", "meritvo", "pilot", "design-pilot", "rep-counter", "smask", "kontakt"];
+const SECTIONS = ["hem", "meritvo", "pilot", "design-pilot", "viska", "referat", "smask", "kontakt"];
 const NAV_DEBOUNCE_MS = 400;
 const NAV_FLICK = 0.6; // spakutslag som räknas som sektionsbläddring
 const HOLD_ZONE = 0.4; // spakutslag som räknas som styrning i spel

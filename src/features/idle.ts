@@ -1,6 +1,6 @@
 import type { FeatureContext, ShapeId } from "../app/contracts";
 
-const CYCLE: ShapeId[] = ["galaxy", "knot", "lattice", "wave", "blob", "ring", "layers"];
+const CYCLE: ShapeId[] = ["galaxy", "knot", "lattice", "wave", "lanes", "blob", "ring", "layers"];
 
 /** Skärmsläckarläge: efter 3 min stillhet tonar UI:t bort och formerna cyklar. */
 export function initIdle(ctx: FeatureContext, restore: () => void): void {

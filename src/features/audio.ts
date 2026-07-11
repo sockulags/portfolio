@@ -23,6 +23,7 @@ const PADS: Record<ShapeId, PadSpec> = {
   lattice: { freqs: [82.4, 110, 146.8, 196], filterHz: 380, detune: 4, type: "sine", level: 1 }, // kvarter
   wave: { freqs: [49, 98, 110, 146.8], filterHz: 340, detune: 6, type: "sine", level: 1.1 }, // pentatonisk drone
   blob: { freqs: [87.3, 110, 130.8, 164.8], filterHz: 300, detune: 5, type: "sine", level: 1.1 }, // varm maj7, lågt
+  lanes: { freqs: [61.7, 92.5, 123.5, 155.6], filterHz: 440, detune: 6, type: "sawtooth", level: 0.9 }, // samtalston, moll
   ring: { freqs: [220, 329.6, 493.9], filterHz: 1400, detune: 9, type: "sine", level: 0.5 }, // luftig
   scatter: { freqs: [92.5, 138.6, 185], filterHz: 600, detune: 10, type: "sine", level: 0.6 },
 };
@@ -198,6 +199,12 @@ export function initAudio(ctx: FeatureContext): { toggle(): void; enabled(): boo
         break;
       case "hit":
         noise(0.08, 0.45, "lowpass", 800);
+        break;
+      case "warp":
+        // accelererande sus: brus som sveper uppåt + stigande grundton
+        noise(1.1, 0.3, "bandpass", 180, 2600);
+        tone(65, "sawtooth", 0.9, 0.18);
+        tone(130, "sine", 1.0, 0.12, 0.15);
         break;
     }
   }
